@@ -1,0 +1,201 @@
+<style>
+.section-{{ section.id }}.custom-marquee {
+  display: flex;
+  align-items: center;
+  height: {{ section.settings.marquee_height }}px;
+  width: 100vw;
+  max-width: 100%;
+  overflow-x: hidden;
+  background: {{ section.settings.colorBackground }};
+  font-family: inherit; 
+}
+
+.section-{{ section.id }}.custom-marquee a {
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  color: inherit;
+  font-family: inherit;
+  width: 100%;
+}
+
+.section-{{ section.id }}.custom-marquee .track {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  will-change: transform;
+}
+
+
+.section-{{ section.id }}.custom-marquee[data-direction="rtl"] .track,
+.section-{{ section.id }}.custom-marquee[data-direction="auto"] .track {
+  animation: marquee-left {{ section.settings.speed }}s linear infinite;
+}
+
+
+.section-{{ section.id }}.custom-marquee[data-direction="ltr"] .track {
+  animation: marquee-right {{ section.settings.speed }}s linear infinite;
+}
+
+
+[dir="rtl"] .section-{{ section.id }}.custom-marquee[data-direction="auto"] .track {
+  animation: marquee-right {{ section.settings.speed }}s linear infinite;
+}
+
+.section-{{ section.id }}.custom-marquee .content {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 20px;
+  margin-right: 20px;
+  font-size: {{ section.settings.font_size }}px;
+  font-weight: 900;
+  font-family: inherit; 
+  color: {{ section.settings.colorText }};
+}
+
+.section-{{ section.id }}.custom-marquee .marquee-icon {
+  margin-left: 10px;
+  margin-right: 10px;
+  width: {{ section.settings.font_size }}px;
+  height: {{ section.settings.font_size }}px;
+  fill: currentColor;
+}
+
+@keyframes marquee-left {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes marquee-right {
+  0% { transform: translateX(-50%); }
+  100% { transform: translateX(0); }
+}
+
+.section-{{ section.id }}.custom-marquee:hover .track {
+  animation-play-state: paused;
+}
+</style>
+
+<div class="section-{{ section.id }} custom-marquee" role="region" data-direction="{{ section.settings.direction }}" {{ section.shopify_attributes }}>
+  {% if section.settings.link != blank -%}
+    <a href="{{ section.settings.link }}">
+  {% endif -%}
+    <div class="track">
+      {%- capture marquee_content -%}
+        {% for block in section.blocks -%}
+          <span class="content marquee-text" {{ block.shopify_attributes }}>
+            {{ block.settings.new_text | escape }}
+            {% if section.settings.link != blank -%}
+              <svg class="marquee-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            {% endif -%}
+          </span>
+        {% endfor -%}
+      {%- endcapture -%}
+      
+      {{ marquee_content }}{{ marquee_content }}{{ marquee_content }}{{ marquee_content }}
+    </div>
+  {% if section.settings.link != blank -%}
+    </a>
+  {% endif -%}
+</div>
+
+{% schema %}
+{
+  "name": "Marquee Text",
+  "settings": [
+    {
+      "type": "color",
+      "id": "colorBackground",
+      "label": "Background color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "colorText",
+      "label": "Text color",
+      "default": "#000000"
+    },
+    {
+      "type": "select",
+      "id": "direction",
+      "label": "Animation Direction",
+      "default": "auto",
+      "options": [
+        {
+          "value": "auto",
+          "label": "Auto (Based on Site Language / RTL)"
+        },
+        {
+          "value": "rtl",
+          "label": "Right to Left"
+        },
+        {
+          "value": "ltr",
+          "label": "Left to Right"
+        }
+      ]
+    },
+    {
+      "type": "url",
+      "id": "link",
+      "label": "Link"
+    },
+    {
+      "type": "range",
+      "id": "marquee_height",
+      "min": 24,
+      "max": 200,
+      "step": 2,
+      "default": 46,
+      "label": "Marquee height"
+    },
+    {
+      "type": "range",
+      "id": "font_size",
+      "min": 8,
+      "max": 100,
+      "step": 2,
+      "default": 24,
+      "label": "Font size"
+    },
+    {
+      "type": "range",
+      "id": "speed",
+      "min": 2,
+      "max": 60,
+      "step": 1,
+      "default": 12,
+      "unit": "s",
+      "label": "Scroll Speed (Seconds)"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "text",
+      "name": "Text",
+      "limit": 20,
+      "settings": [
+        {
+          "type": "text",
+          "id": "new_text",
+          "default": "Welcome to our store",
+          "label": "Text"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Marquee Text",
+      "blocks": [
+        { "type": "text" },
+        { "type": "text" },
+        { "type": "text" }
+
+      ]
+    }
+  ]
+}
+{% endschema %}
